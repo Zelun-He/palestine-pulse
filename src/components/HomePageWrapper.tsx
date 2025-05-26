@@ -6,10 +6,8 @@ const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function HomePageWrapper() {
   return (
-    <main className="h-screen w-full flex items-center justify-center bg-gray-100">
-      <div className="w-full h-full">
-        <Map />
-      </div>
+    <main className="w-screen h-screen bg-gray-100 overflow-hidden">
+      <Map />
     </main>
   );
 }
