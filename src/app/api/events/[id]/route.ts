@@ -1,22 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query, queryOne } from '@/lib/db';
+import { query } from '@/lib/db';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+interface RouteParams {
+  params: Promise<{ id: string }>;
+}
+
+export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const eventId = params.id;
+    const { id } = await params;
     
-    if (!eventId) {
+    if (!id) {
       return NextResponse.json(
         { error: 'Event ID is required' },
         { status: 400 }
       );
     }
-    
+
     // Fetch event details
-    const eventSql = `
+    const eventQuery = `
       SELECT 
         e.id,
         e.canonical_title,
@@ -24,119 +25,95 @@ export async function GET(
         e.category,
         e.severity,
         e.summary,
-        ST_AsText(e.geom::geometry) as geom,
         e.location_text,
         e.admin1,
         e.admin2,
         e.admin3,
-        e.privacy_obfuscation_m,
-        e.created_at,
-        e.updated_at
+        ST_AsText(e.geom::geometry) as geom
       FROM events e
       WHERE e.id = $1
     `;
     
-    const event = await queryOne(eventSql, [eventId]);
+    const eventRows = await query(eventQuery, [id]);
     
-    if (!event) {
+    if (eventRows.length === 0) {
       return NextResponse.json(
         { error: 'Event not found' },
         { status: 404 }
       );
     }
     
-    // Fetch linked articles with source information
-    const articlesSql = `
+    const event = eventRows[0];
+    
+    // Fetch linked articles
+    const articlesQuery = `
       SELECT 
         a.id,
         a.title,
         a.url,
         a.published_at,
-        a.lang,
         a.raw_text,
-        a.status,
-        ea.similarity,
-        ea.is_primary,
         s.name as source_name,
-        s.url as source_url,
-        s.type as source_type,
-        s.credibility_score
+        s.credibility_score,
+        ea.similarity,
+        ea.is_primary
       FROM event_articles ea
       JOIN articles a ON ea.article_id = a.id
       JOIN sources s ON a.source_id = s.id
       WHERE ea.event_id = $1
-      ORDER BY ea.is_primary DESC, ea.similarity DESC, a.published_at DESC
+      ORDER BY ea.is_primary DESC, ea.similarity DESC
     `;
     
-    const articles = await query(articlesSql, [eventId]);
+    const articles = await query(articlesQuery, [id]);
     
     // Fetch tags
-    const tagsSql = `
+    const tagsQuery = `
       SELECT t.name
       FROM event_tags et
       JOIN tags t ON et.tag_id = t.id
       WHERE et.event_id = $1
-      ORDER BY t.name
     `;
     
-    const tags = await query(tagsSql, [eventId]);
+    const tags = await query(tagsQuery, [id]);
     
-    // Parse geometry coordinates
-    let coordinates: [number, number] | null = null;
+    // Parse geometry
+    let coordinates: number[] | number[][] = [];
     if (event.geom && event.geom.startsWith('POINT')) {
       const match = event.geom.match(/POINT\(([^)]+)\)/);
       if (match) {
-        const [lng, lat] = match[1].split(' ').map(Number);
-        coordinates = [lng, lat];
+        coordinates = match[1].split(' ').map(Number);
       }
     }
     
-    // Build response
-    const response = {
+    const eventData = {
       id: event.id,
       title: event.canonical_title,
       occurred_at: event.occurred_at.toISOString(),
       category: event.category,
       severity: event.severity,
       summary: event.summary,
-      coordinates: coordinates,
       location_text: event.location_text,
-      administrative: {
-        admin1: event.admin1,
-        admin2: event.admin2,
-        admin3: event.admin3
+      admin1: event.admin1,
+      admin2: event.admin2,
+      admin3: event.admin3,
+      geometry: {
+        type: 'Point',
+        coordinates: coordinates
       },
-      privacy_obfuscation_m: event.privacy_obfuscation_m,
       articles: articles.map(article => ({
         id: article.id,
         title: article.title,
         url: article.url,
         published_at: article.published_at.toISOString(),
-        lang: article.lang,
-        summary: article.raw_text.substring(0, 200) + (article.raw_text.length > 200 ? '...' : ''),
-        similarity: parseFloat(article.similarity),
-        is_primary: article.is_primary,
-        source: {
-          name: article.source_name,
-          url: article.source_url,
-          type: article.source_type,
-          credibility_score: parseFloat(article.credibility_score)
-        }
+        source_name: article.source_name,
+        credibility_score: article.credibility_score,
+        similarity: article.similarity,
+        is_primary: article.is_primary
       })),
-      tags: tags.map(tag => tag.name),
-      metadata: {
-        created_at: event.created_at.toISOString(),
-        updated_at: event.updated_at.toISOString(),
-        article_count: articles.length
-      }
+      tags: tags.map(tag => tag.name)
     };
     
-    return NextResponse.json(response, {
-      headers: {
-        'Cache-Control': 'public, max-age=600', // Cache for 10 minutes
-        'Content-Type': 'application/json'
-      }
-    });
+    return NextResponse.json(eventData);
     
   } catch (error) {
     console.error('Error fetching event:', error);
