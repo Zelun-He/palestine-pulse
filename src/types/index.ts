@@ -2,7 +2,7 @@ export interface Source {
   id: string;
   name: string;
   url: string;
-  type: 'primary_ngo' | 'international_media' | 'local_media' | 'government' | 'other';
+  type: 'primary_ngo' | 'international_media' | 'local_media' | 'government' | 'ngo' | 'other';
   credibility_score: number;
   created_at: Date;
   updated_at: Date;
@@ -15,10 +15,11 @@ export interface Article {
   title: string;
   published_at: Date;
   fetched_at: Date;
-  lang: string;
+  language: string;
   raw_text: string;
   hash: string;
   status: 'pending' | 'processed' | 'error' | 'archived';
+  tags?: string[];
   created_at: Date;
   updated_at: Date;
 }
@@ -72,6 +73,9 @@ export interface EventFilters {
   start_date?: Date;
   end_date?: Date;
   category?: Event['category'];
+  severity?: Event['severity'];
+  source_type?: string;
+  location?: string;
   min_credibility?: number;
   zoom?: number;
   search?: string;

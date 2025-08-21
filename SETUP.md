@@ -115,3 +115,4 @@ Open your browser and go to: **http://localhost:3000**
 ### Build Errors
 - Clear `.next` folder: `rm -rf .next`
 - Reinstall dependencies: `rm -rf node_modules && npm install`
+

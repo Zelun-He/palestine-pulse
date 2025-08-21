@@ -1,8 +1,7 @@
 import FeedParser from 'feedparser';
 import { Readable } from 'stream';
-import * as cheerio from 'cheerio';
 import { Pool } from 'pg';
-import { db } from './db';
+import db from './db';
 
 // RSS Sources for Palestine-related news
 const RSS_SOURCES = [
@@ -60,20 +59,7 @@ interface RSSItem {
   hash: string;
 }
 
-interface ProcessedArticle {
-  title: string;
-  url: string;
-  published_at: Date;
-  fetched_at: Date;
-  language: string;
-  raw_text: string;
-  hash: string;
-  source_id: string;
-  extracted_locations: string[];
-  extracted_organizations: string[];
-  extracted_people: string[];
-  status: 'pending' | 'processed' | 'failed';
-}
+
 
 export class RSSFetcher {
   private pool: Pool;
@@ -106,22 +92,22 @@ export class RSSFetcher {
       
       const parser = new FeedParser({});
       
-      parser.on('readable', function() {
-        let item;
-        while (item = this.read()) {
-          const rssItem: RSSItem = {
-            title: item.title || '',
-            description: item.description || '',
-            link: item.link || '',
-            pubDate: item.pubDate || new Date(),
-            author: item.author,
-            categories: item.categories,
-            content: item.content,
-            hash: this.generateHash(item.title + item.description + item.link)
-          };
-          items.push(rssItem);
-        }
-      });
+             parser.on('readable', () => {
+         let item;
+         while (item = parser.read()) {
+           const rssItem: RSSItem = {
+             title: item.title || '',
+             description: item.description || '',
+             link: item.link || '',
+             pubDate: item.pubdate || new Date(),
+             author: item.author,
+             categories: item.categories,
+             content: item.summary || '',
+             hash: this.generateHash(item.title + item.description + item.link)
+           };
+           items.push(rssItem);
+         }
+       });
 
       parser.on('end', () => resolve(items));
       parser.on('error', reject);
@@ -352,21 +338,23 @@ export class RSSFetcher {
 
 // Cron job setup
 export function setupCronJobs(): void {
-  const cron = require('node-cron');
-  
-  // Run every 30 minutes
-  cron.schedule('*/30 * * * *', async () => {
-    console.log('Running scheduled RSS fetch...');
-    const fetcher = new RSSFetcher();
-    await fetcher.processArticles();
-  });
+  // Dynamic import to avoid require() issues
+  import('node-cron').then(cron => {
+    // Run every 30 minutes
+    cron.schedule('*/30 * * * *', async () => {
+      console.log('Running scheduled RSS fetch...');
+      const fetcher = new RSSFetcher();
+      await fetcher.processArticles();
+    });
 
-  // Run backfill daily at 2 AM
-  cron.schedule('0 2 * * *', async () => {
-    console.log('Running daily backfill...');
-    const fetcher = new RSSFetcher();
-    await fetcher.backfillLastWeek();
-  });
+    // Run backfill daily at 2 AM
+    cron.schedule('0 2 * * *', async () => {
+      console.log('Running daily backfill...');
+      const fetcher = new RSSFetcher();
+      await fetcher.backfillLastWeek();
+    });
 
-  console.log('Cron jobs configured');
+    console.log('Cron jobs configured');
+  });
 }
+

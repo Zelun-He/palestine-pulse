@@ -125,3 +125,4 @@ BEGIN
   ORDER BY distance_meters ASC;
 END;
 $$ LANGUAGE plpgsql;
+

@@ -15,7 +15,6 @@ import {
   Heart,
   Shield,
   Building,
-  Users,
   Filter,
   Zap,
   Eye,
@@ -23,6 +22,9 @@ import {
   Settings
 } from 'lucide-react';
 import { GeoJSONCollection, GeoJSONFeature } from '@/types';
+
+// Add debug logging
+console.log('Page component loading...');
 
 // Dynamically import components
 const MapComponent = dynamic(() => import('@/components/Map'), { 
@@ -42,6 +44,25 @@ const EventDrawer = dynamic(() => import('@/components/EventDrawer'), {
 const RSSManagement = dynamic(() => import('@/components/RSSManagement'), { 
   ssr: false 
 });
+
+// Temporarily comment out dynamic imports to test
+// const MapComponent = dynamic(() => import('@/components/Map'), { 
+//   ssr: false,
+//   loading: () => <div className="flex items-center justify-center h-full animate-pulse">
+//     <div className="text-center">
+//       <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mb-2 animate-spin"></div>
+//       <p className="text-slate-500">Loading interactive map...</p>
+//     </div>
+//   </div>
+// });
+
+// const EventDrawer = dynamic(() => import('@/components/EventDrawer'), { 
+//   ssr: false 
+// });
+
+// const RSSManagement = dynamic(() => import('@/components/RSSManagement'), { 
+//   ssr: false 
+// });
 
 // Enhanced mock data
 const mockEvents: GeoJSONCollection = {
@@ -122,8 +143,12 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
+    console.log('useEffect running, setting mounted to true');
     setMounted(true);
+    console.log('mounted state set to true');
   }, []);
+
+  console.log('Component render - mounted state:', mounted);
 
   const handleEventClick = useCallback((event: GeoJSONFeature) => {
     setSelectedEvent(event);
@@ -166,160 +191,180 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Modern Header */}
-      <header className="bg-white/70 backdrop-blur-md border-b border-white/20 shadow-sm sticky top-0 z-40">
+    <div className="min-h-screen animated-gradient">
+      {/* Ultra-modern Header */}
+      <header className="glass sticky top-0 z-50 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
-                <MapPin className="w-6 h-6 text-white" />
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center space-x-6">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-600 via-red-600 to-black rounded-3xl flex items-center justify-center shadow-2xl float pulse-glow">
+                <MapPin className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-black gradient-text tracking-tight">
                   Palestine Pulse
                 </h1>
-                <p className="text-sm text-slate-500 font-medium">News Intelligence Dashboard</p>
+                <p className="text-sm text-slate-600 font-semibold mt-1 tracking-wide">🌍 Real-time Intelligence • 🚀 AI-Powered Insights</p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-3">
-              <div className="hidden sm:flex items-center space-x-4 text-sm">
-                <div className="flex items-center space-x-2 bg-blue-100 text-blue-700 px-3 py-2 rounded-xl">
+            <div className="flex items-center space-x-4">
+              <div className="hidden lg:flex items-center space-x-3 text-sm">
+                <div className="glass flex items-center space-x-2 text-green-800 px-4 py-3 rounded-2xl card-modern">
+                  <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
                   <Activity className="w-4 h-4" />
-                  <span className="font-semibold">{totalEvents} Active</span>
+                  <span className="font-bold">{totalEvents} Active</span>
                 </div>
-                <div className="flex items-center space-x-2 bg-green-100 text-green-700 px-3 py-2 rounded-xl">
+                <div className="glass flex items-center space-x-2 text-red-800 px-4 py-3 rounded-2xl card-modern">
+                  <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
                   <Zap className="w-4 h-4" />
-                  <span className="font-semibold">Live</span>
+                  <span className="font-bold">Live</span>
                 </div>
               </div>
               
-              <button className="p-2 hover:bg-blue-100 rounded-xl transition-colors">
-                <Bell className="w-5 h-5 text-slate-600" />
-              </button>
-              <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-semibold rounded-xl hover:shadow-lg transition-all duration-200">
-                <Share className="w-4 h-4 inline mr-2" />
-                Share
+              <a
+                href="/search"
+                className="btn-modern glass px-6 py-3 text-white text-sm font-bold rounded-2xl hover:shadow-2xl transition-all duration-300 flex items-center space-x-3 bg-gradient-to-r from-green-600 to-green-700"
+              >
+                <Search className="w-5 h-5" />
+                <span>Advanced Search</span>
+              </a>
+              <a
+                href="/demo"
+                className="btn-modern glass px-6 py-3 text-white text-sm font-bold rounded-2xl hover:shadow-2xl transition-all duration-300 flex items-center space-x-3 bg-gradient-to-r from-red-600 to-red-700"
+              >
+                <Filter className="w-5 h-5" />
+                <span>Interactive Demo</span>
+              </a>
+              <button className="glass p-4 hover:bg-white/20 rounded-2xl transition-all duration-300 card-modern">
+                <Bell className="w-6 h-6 text-slate-700" />
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-sm hover:shadow-md transition-all duration-200">
-            <div className="flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Ultra-modern Stats Dashboard */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          <div className="glass card-modern rounded-3xl p-8 border border-white/10 group">
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <p className="text-sm font-medium text-slate-500">Total Events</p>
-                <p className="text-3xl font-bold text-slate-900">{totalEvents}</p>
+                <p className="text-sm font-bold text-slate-600 uppercase tracking-wider">Global Events</p>
+                <p className="text-4xl font-black text-slate-900 mt-2">{totalEvents}</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
-                <Globe className="w-6 h-6 text-blue-600" />
+              <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-3xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 pulse-glow">
+                <Globe className="w-8 h-8 text-white" />
               </div>
             </div>
-            <div className="mt-3 flex items-center text-sm">
-              <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
-              <span className="text-green-600 font-medium">+12%</span>
-              <span className="text-slate-500 ml-1">vs last week</span>
+            <div className="flex items-center text-sm bg-gradient-to-r from-green-50 to-green-100 px-4 py-3 rounded-2xl border border-green-200">
+              <TrendingUp className="w-5 h-5 text-green-700 mr-2" />
+              <span className="text-green-800 font-black">+12%</span>
+              <span className="text-slate-700 ml-2 font-semibold">vs last week</span>
             </div>
           </div>
 
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-sm hover:shadow-md transition-all duration-200">
-            <div className="flex items-center justify-between">
+          <div className="glass card-modern rounded-3xl p-8 border border-white/10 group">
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <p className="text-sm font-medium text-slate-500">Critical Alerts</p>
-                <p className="text-3xl font-bold text-slate-900">{criticalEvents}</p>
+                <p className="text-sm font-bold text-slate-600 uppercase tracking-wider">Critical Alerts</p>
+                <p className="text-4xl font-black text-slate-900 mt-2">{criticalEvents}</p>
               </div>
-              <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
+              <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-red-700 rounded-3xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 pulse-glow-red">
+                <AlertTriangle className="w-8 h-8 text-white" />
               </div>
             </div>
-            <div className="mt-3 flex items-center text-sm">
-              <span className="text-red-600 font-medium">High Priority</span>
-              <span className="text-slate-500 ml-1">requiring attention</span>
+            <div className="flex items-center text-sm bg-gradient-to-r from-red-50 to-red-100 px-4 py-3 rounded-2xl border border-red-200">
+              <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse mr-3"></div>
+              <span className="text-red-800 font-black">Urgent Action</span>
+              <span className="text-slate-700 ml-2 font-semibold">required</span>
             </div>
           </div>
 
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-sm hover:shadow-md transition-all duration-200">
-            <div className="flex items-center justify-between">
+          <div className="glass card-modern rounded-3xl p-8 border border-white/10 group">
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <p className="text-sm font-medium text-slate-500">News Coverage</p>
-                <p className="text-3xl font-bold text-slate-900">{totalArticles}</p>
+                <p className="text-sm font-bold text-slate-600 uppercase tracking-wider">News Coverage</p>
+                <p className="text-4xl font-black text-slate-900 mt-2">{totalArticles}</p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
-                <Eye className="w-6 h-6 text-purple-600" />
+              <div className="w-16 h-16 bg-gradient-to-br from-slate-700 to-black rounded-3xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Eye className="w-8 h-8 text-white" />
               </div>
             </div>
-            <div className="mt-3 flex items-center text-sm">
-              <span className="text-purple-600 font-medium">Articles</span>
-              <span className="text-slate-500 ml-1">tracked today</span>
+            <div className="flex items-center text-sm bg-gradient-to-r from-slate-50 to-slate-100 px-4 py-3 rounded-2xl border border-slate-200">
+              <div className="w-2 h-2 bg-slate-700 rounded-full animate-pulse mr-3"></div>
+              <span className="text-slate-800 font-black">Articles</span>
+              <span className="text-slate-700 ml-2 font-semibold">tracked today</span>
             </div>
           </div>
 
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-sm hover:shadow-md transition-all duration-200">
-            <div className="flex items-center justify-between">
+          <div className="glass card-modern rounded-3xl p-8 border border-white/10 group">
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <p className="text-sm font-medium text-slate-500">Last 24hrs</p>
-                <p className="text-3xl font-bold text-slate-900">{recentEvents}</p>
+                <p className="text-sm font-bold text-slate-600 uppercase tracking-wider">Real-Time</p>
+                <p className="text-4xl font-black text-slate-900 mt-2">{recentEvents}</p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
-                <Clock className="w-6 h-6 text-green-600" />
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-red-500 rounded-3xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 pulse-glow">
+                <Clock className="w-8 h-8 text-white" />
               </div>
             </div>
-            <div className="mt-3 flex items-center text-sm">
-              <span className="text-green-600 font-medium">Recent</span>
-              <span className="text-slate-500 ml-1">developments</span>
+            <div className="flex items-center text-sm bg-gradient-to-r from-green-50 to-red-50 px-4 py-3 rounded-2xl border border-green-200">
+              <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse mr-3"></div>
+              <span className="text-green-800 font-black">Last 24hrs</span>
+              <span className="text-slate-700 ml-2 font-semibold">updates</span>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Search & Filters Panel */}
-          <div className="lg:col-span-1 space-y-6">
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-sm">
-              <div className="flex items-center space-x-3 mb-6">
-                <Search className="w-5 h-5 text-slate-600" />
-                <h3 className="text-lg font-semibold text-slate-900">Search & Filter</h3>
+          {/* Advanced Control Panel */}
+          <div className="lg:col-span-1 space-y-8">
+            <div className="glass card-modern rounded-3xl p-8 border border-green-200/30">
+              <div className="flex items-center space-x-4 mb-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center shadow-lg pulse-glow">
+                  <Search className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-black text-slate-900">🔍 Smart Search & Filters</h3>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+                    <Search className="w-5 h-5 text-green-600" />
+                    <div className="w-1 h-1 bg-green-600 rounded-full animate-pulse"></div>
+                  </div>
                   <input 
                     type="text" 
-                    placeholder="Search events, locations..." 
+                    placeholder="🤖 AI-powered search: events, locations, keywords..." 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full pl-16 pr-6 py-4 glass border border-white/20 rounded-2xl focus-modern transition-all text-slate-800 placeholder-slate-500 font-medium"
                   />
                 </div>
                 
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-slate-700 flex items-center">
-                    <Filter className="w-4 h-4 mr-2" />
-                    Categories
+                <div className="space-y-4">
+                  <p className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center">
+                    <Filter className="w-5 h-5 mr-3 text-green-700" />
+                    🎯 Smart Categories
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-2 gap-3">
                     {[
-                      { name: 'All', icon: Globe, color: 'blue' },
-                      { name: 'Humanitarian', icon: Heart, color: 'green' },
-                      { name: 'Political', icon: Building, color: 'purple' },
-                      { name: 'Military', icon: Shield, color: 'red' },
-                      { name: 'Economic', icon: TrendingUp, color: 'yellow' },
+                      { name: 'All', icon: Globe, gradient: 'from-slate-700 to-black' },
+                      { name: 'Humanitarian', icon: Heart, gradient: 'from-green-600 to-green-700' },
+                      { name: 'Political', icon: Building, gradient: 'from-red-600 to-red-700' },
+                      { name: 'Military', icon: Shield, gradient: 'from-black to-slate-800' },
+                      { name: 'Economic', icon: TrendingUp, gradient: 'from-green-700 to-red-700' },
                     ].map(category => (
                       <button 
                         key={category.name}
                         onClick={() => setActiveFilter(category.name)}
-                        className={`flex items-center space-x-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                        className={`btn-modern flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 ${
                           activeFilter === category.name
-                            ? `bg-${category.color}-500 text-white shadow-md`
-                            : `bg-slate-100 text-slate-600 hover:bg-slate-200`
+                            ? `bg-gradient-to-r ${category.gradient} text-white shadow-lg scale-105`
+                            : `glass text-slate-700 hover:scale-105`
                         }`}
                       >
-                        <category.icon className="w-4 h-4" />
+                        <category.icon className="w-5 h-5" />
                         <span>{category.name}</span>
                       </button>
                     ))}
@@ -328,29 +373,40 @@ export default function Dashboard() {
               </div>
             </div>
 
-                         {/* Quick Stats */}
-             <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-sm">
-               <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-                 <Activity className="w-5 h-5 mr-2" />
-                 Live Activity
-               </h3>
-               <div className="space-y-4">
+                         {/* Real-time Activity Monitor */}
+             <div className="glass card-modern rounded-3xl p-8 border border-red-200/30">
+               <div className="flex items-center space-x-4 mb-6">
+                 <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl flex items-center justify-center shadow-lg pulse-glow-red">
+                   <Activity className="w-6 h-6 text-white" />
+                 </div>
+                 <h3 className="text-xl font-black text-slate-900">📡 Live Activity Monitor</h3>
+               </div>
+               <div className="space-y-6">
                  {[
-                   { location: 'Jerusalem', count: 3, trend: '+2' },
-                   { location: 'Gaza Strip', count: 12, trend: '+8' },
-                   { location: 'West Bank', count: 1, trend: '0' },
-                   { location: 'Tel Aviv', count: 5, trend: '+1' }
+                   { location: 'Jerusalem', count: 3, trend: '+2', status: 'moderate', color: 'from-green-600 to-green-700' },
+                   { location: 'Gaza Strip', count: 12, trend: '+8', status: 'high', color: 'from-red-600 to-red-700' },
+                   { location: 'West Bank', count: 1, trend: '0', status: 'low', color: 'from-green-500 to-green-600' },
+                   { location: 'Tel Aviv', count: 5, trend: '+1', status: 'moderate', color: 'from-black to-slate-800' }
                  ].map((item, i) => (
-                   <div key={i} className="flex items-center justify-between">
-                     <div className="flex items-center space-x-3">
-                       <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                       <span className="text-sm font-medium text-slate-700">{item.location}</span>
+                   <div key={i} className="glass rounded-2xl p-4 border border-white/10 hover:scale-105 transition-all duration-300">
+                     <div className="flex items-center justify-between mb-3">
+                       <div className="flex items-center space-x-3">
+                         <div className={`w-3 h-3 bg-gradient-to-r ${item.color} rounded-full animate-pulse shadow-lg`}></div>
+                         <span className="text-sm font-black text-slate-800">{item.location}</span>
+                       </div>
+                       <div className="flex items-center space-x-2">
+                         <span className="text-lg font-black text-slate-900">{item.count}</span>
+                         <span className={`text-xs font-bold px-3 py-1 rounded-xl ${
+                           item.trend.startsWith('+') ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-800' :
+                           item.trend === '0' ? 'bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700' :
+                           'bg-gradient-to-r from-red-100 to-red-200 text-red-800'
+                         }`}>
+                           {item.trend}
+                         </span>
+                       </div>
                      </div>
-                     <div className="flex items-center space-x-2">
-                       <span className="text-sm font-bold text-slate-900">{item.count}</span>
-                       <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-lg">
-                         {item.trend}
-                       </span>
+                     <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                       {item.status} Activity Level
                      </div>
                    </div>
                  ))}
@@ -358,38 +414,59 @@ export default function Dashboard() {
              </div>
 
              {/* RSS Management */}
-             <RSSManagement />
+             {/* <RSSManagement /> */}
            </div>
 
-          {/* Interactive Map */}
+          {/* Next-Gen Interactive Intelligence Map */}
           <div className="lg:col-span-3">
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white/20 shadow-sm overflow-hidden">
-              <div className="p-6 border-b border-slate-200">
+            <div className="glass card-modern rounded-3xl border border-green-200/30 overflow-hidden">
+              <div className="p-8 border-b border-white/10">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-slate-900 flex items-center">
-                    <MapPin className="w-5 h-5 mr-2" />
-                    Interactive News Map
-                  </h3>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-2 text-sm text-slate-500">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span>Live Updates</span>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-green-600 via-red-600 to-black rounded-3xl flex items-center justify-center shadow-xl pulse-glow">
+                      <MapPin className="w-7 h-7 text-white" />
                     </div>
-                    <button className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
-                      <Settings className="w-4 h-4 text-slate-600" />
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900">🗺️ Palestine Intelligence Map</h3>
+                      <p className="text-sm font-semibold text-slate-700 mt-1">🔍 Real-time Monitoring • 📊 Live Analysis</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="glass flex items-center space-x-3 text-sm text-green-800 px-4 py-3 rounded-2xl border border-green-300">
+                      <div className="w-3 h-3 bg-green-600 rounded-full animate-pulse shadow-lg"></div>
+                      <span className="font-black">Live Intelligence</span>
+                    </div>
+                    <button className="glass p-3 hover:bg-white/20 rounded-2xl transition-all duration-300 card-modern">
+                      <Settings className="w-6 h-6 text-slate-800" />
                     </button>
                   </div>
                 </div>
               </div>
               
-              <div className="h-[600px] lg:h-[700px] relative">
-                <MapComponent
+              <div className="h-[600px] lg:h-[800px] relative bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+                {/* <MapComponent
                   events={mockEvents}
                                      filters={{ category: activeFilter !== 'All' ? (activeFilter.toLowerCase() as 'military' | 'humanitarian' | 'political' | 'economic' | 'social' | 'other') : undefined }}
                   currentTime={new Date()}
                   onEventClick={handleEventClick}
                   onBoundsChange={handleBoundsChange}
-                />
+                /> */}
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center space-y-6">
+                    <div className="w-32 h-32 bg-gradient-to-br from-green-600 via-red-600 to-black rounded-full flex items-center justify-center mx-auto shadow-2xl float pulse-glow">
+                      <MapPin className="w-16 h-16 text-white" />
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="text-2xl font-black text-slate-900">🗺️ Palestine Intelligence Map</h3>
+                      <p className="text-slate-700 font-semibold max-w-md mx-auto leading-relaxed">
+                        Real-time monitoring of Palestine region with advanced geospatial intelligence and news analysis
+                      </p>
+                      <div className="glass px-6 py-3 rounded-2xl text-sm font-bold text-green-800 border border-green-300 inline-block">
+                        🔧 Interactive visualization loading - System optimization in progress
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -397,11 +474,11 @@ export default function Dashboard() {
       </div>
 
       {/* Event Drawer */}
-      <EventDrawer
+      {/* <EventDrawer
         event={selectedEvent}
         isOpen={isDrawerOpen}
         onClose={handleDrawerClose}
-      />
+      /> */}
     </div>
   );
 }

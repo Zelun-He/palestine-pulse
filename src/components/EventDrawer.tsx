@@ -368,3 +368,4 @@ export default function EventDrawer({ event, isOpen, onClose }: EventDrawerProps
     </div>
   );
 }
+
