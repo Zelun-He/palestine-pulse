@@ -1,36 +1,228 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Palestine Pulse 🌍
 
-## Getting Started
+A real-time incident mapping and analysis platform for Palestine, providing interactive visualizations of events, news, and developments across the region.
 
-First, run the development server:
+## 🚀 Features
 
+### MVP Features (Current)
+- **Interactive Map**: Real-time incident mapping with clustering and category-based visualization
+- **Advanced Search**: Faceted search with filters for category, severity, date range, and source credibility
+- **Timeline Scrubber**: Time-based playback controls to see events unfold over time
+- **Event Details**: Comprehensive event information with linked articles and source analysis
+- **Responsive Design**: Modern, mobile-friendly interface built with Tailwind CSS
+
+### Planned Features
+- **Heatmap Visualization**: Density-based clustering and choropleth maps by administrative regions
+- **Article Management**: RSS ingestion pipeline with deduplication and geocoding
+- **Analytics Dashboard**: Weekly trends, category distribution, and source credibility analysis
+- **Moderation Tools**: Event merging, duplicate detection, and editorial oversight
+- **API Integration**: RESTful APIs for third-party integrations and data export
+
+## 🏗️ Architecture
+
+### Frontend
+- **Next.js 15** with App Router for server-side rendering and API routes
+- **TypeScript** for type safety and developer experience
+- **Tailwind CSS** for modern, responsive styling
+- **Leaflet** with React-Leaflet for interactive mapping
+- **React 19** with modern hooks and state management
+
+### Backend
+- **Next.js API Routes** for RESTful endpoints
+- **PostgreSQL** with PostGIS extension for spatial data
+- **Connection Pooling** with optimized query performance
+- **Full-text Search** with PostgreSQL's built-in search capabilities
+
+### Data Model
+- **Sources**: News outlets, NGOs, and government sources with credibility scoring
+- **Articles**: Raw content with metadata, language detection, and deduplication
+- **Events**: Geospatial incidents with categorization, severity, and privacy controls
+- **Relationships**: Many-to-many connections between events and articles
+
+## 🛠️ Setup & Installation
+
+### Prerequisites
+- Node.js 18+ and npm/yarn
+- PostgreSQL 14+ with PostGIS extension
+- Git
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-username/palestine-pulse.git
+cd palestine-pulse
+```
+
+### 2. Install Dependencies
+```bash
+npm install
+# or
+yarn install
+```
+
+### 3. Database Setup
+```bash
+# Create a PostgreSQL database
+createdb palestine_pulse
+
+# Enable PostGIS extension
+psql -d palestine_pulse -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+
+# Run the schema
+psql -d palestine_pulse -f src/lib/schema.sql
+```
+
+### 4. Environment Configuration
+Create a `.env.local` file in the root directory:
+```env
+DATABASE_URL=postgresql://username:password@localhost:5432/palestine_pulse
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 5. Development Server
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🗄️ Database Schema
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Core Tables
+- **sources**: News sources with credibility scoring
+- **articles**: Raw content and metadata
+- **events**: Geospatial incidents with categorization
+- **event_articles**: Many-to-many relationships
+- **tags**: Event categorization and labeling
 
-## Learn More
+### Spatial Features
+- **PostGIS Integration**: Native support for geographic data types
+- **Spatial Indexing**: Optimized queries for bounding box operations
+- **Coordinate Privacy**: Built-in support for location obfuscation
 
-To learn more about Next.js, take a look at the following resources:
+### Performance Optimizations
+- **Composite Indexes**: Multi-column indexing for common query patterns
+- **Full-text Search**: PostgreSQL text search with relevance scoring
+- **Connection Pooling**: Efficient database connection management
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔌 API Endpoints
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Events
+- `GET /api/events` - Fetch events with filtering and spatial queries
+- `GET /api/events/[id]` - Get detailed event information
+- `GET /api/articles` - Search and filter articles
+- `GET /api/analytics` - Dashboard metrics and trends
 
-## Deploy on Vercel
+### Query Parameters
+- **bbox**: Bounding box for spatial filtering (west,south,east,north)
+- **category**: Event category filter
+- **start/end**: Date range filtering
+- **minCred**: Minimum source credibility threshold
+- **search**: Full-text search across titles and content
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎨 UI Components
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Core Components
+- **Map**: Interactive Leaflet map with custom markers and clustering
+- **SearchPanel**: Advanced filtering with expandable options
+- **TimelineScrubber**: Time-based playback controls
+- **EventDetails**: Comprehensive event information display
+
+### Design System
+- **Color Coding**: Category and severity-based visual indicators
+- **Responsive Layout**: Mobile-first design with sidebar navigation
+- **Interactive Elements**: Hover states, animations, and smooth transitions
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+```bash
+npm install -g vercel
+vercel --prod
+```
+
+### Environment Variables
+Set the following environment variables in your deployment platform:
+- `DATABASE_URL`: PostgreSQL connection string
+- `NEXT_PUBLIC_APP_URL`: Public application URL
+
+### Database Requirements
+- **PostgreSQL 14+** with PostGIS extension
+- **Connection Pooling** enabled
+- **SSL** connections for production environments
+
+## 🔒 Security & Privacy
+
+### Data Protection
+- **Coordinate Privacy**: Automatic obfuscation for sensitive locations
+- **Source Attribution**: Immutable source references and credibility scoring
+- **Rate Limiting**: API endpoint protection against abuse
+
+### Ethical Considerations
+- **Content Disclaimer**: Clear labeling of source types and credibility
+- **Privacy Controls**: User-configurable location precision
+- **Transparency**: Open source with clear data handling policies
+
+## 🤝 Contributing
+
+### Development Guidelines
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Code Standards
+- **TypeScript**: Strict type checking enabled
+- **ESLint**: Consistent code formatting and quality
+- **Prettier**: Automated code formatting
+- **Testing**: Unit tests for critical components
+
+## 📊 Roadmap
+
+### Phase 1: Core Platform (Current)
+- [x] Interactive map with event markers
+- [x] Search and filtering system
+- [x] Timeline playback controls
+- [x] Basic event details
+
+### Phase 2: Data Ingestion
+- [ ] RSS feed integration
+- [ ] Automated geocoding
+- [ ] Content deduplication
+- [ ] Source credibility scoring
+
+### Phase 3: Advanced Analytics
+- [ ] Heatmap visualizations
+- [ ] Trend analysis
+- [ ] Export capabilities
+- [ ] API documentation
+
+### Phase 4: Community Features
+- [ ] User submissions
+- [ ] Moderation tools
+- [ ] Community feedback
+- [ ] Mobile applications
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **OpenStreetMap** for base map data
+- **Leaflet** for interactive mapping
+- **PostGIS** for spatial database capabilities
+- **Next.js** for the modern React framework
+
+## 📞 Support
+
+For questions, issues, or contributions:
+- **Issues**: [GitHub Issues](https://github.com/your-username/palestine-pulse/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-username/palestine-pulse/discussions)
+- **Email**: support@palestine-pulse.org
+
+---
+
+**Palestine Pulse** - Empowering transparency and understanding through real-time incident mapping and analysis.
