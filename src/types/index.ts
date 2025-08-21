@@ -77,12 +77,15 @@ export interface EventFilters {
   search?: string;
 }
 
+// Mapbox-compatible GeoJSON types
+export interface GeoJSONPoint {
+  type: 'Point';
+  coordinates: [number, number]; // [longitude, latitude]
+}
+
 export interface GeoJSONFeature {
   type: 'Feature';
-  geometry: {
-    type: 'Point' | 'Polygon';
-    coordinates: number[] | number[][];
-  };
+  geometry: GeoJSONPoint;
   properties: {
     id: string;
     title: string;
@@ -91,6 +94,7 @@ export interface GeoJSONFeature {
     occurred_at: string;
     location_text: string;
     article_count: number;
+    credibility_avg?: number;
     [key: string]: any;
   };
 }

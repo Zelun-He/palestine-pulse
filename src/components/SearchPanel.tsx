@@ -55,7 +55,7 @@ export default function SearchPanel({ onFiltersChange, onSearch, className = '' 
     if (selectedCategory) newFilters.category = selectedCategory as Event['category'];
     if (dateRange.start) newFilters.start_date = new Date(dateRange.start);
     if (dateRange.end) newFilters.end_date = new Date(dateRange.end);
-    if (minCredibility > 0) newFilters.minCred = minCredibility;
+    if (minCredibility > 0) newFilters.min_credibility = minCredibility;
     
     setFilters(newFilters);
     onFiltersChange(newFilters);

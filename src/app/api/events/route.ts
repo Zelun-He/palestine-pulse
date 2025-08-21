@@ -118,11 +118,14 @@ export async function GET(request: NextRequest) {
     // Convert to GeoJSON
     const features: GeoJSONFeature[] = rows.map(row => {
       // Parse WKT geometry to coordinates
-      let coordinates: number[] | number[][] = [];
+      let coordinates: [number, number] = [0, 0]; // Default coordinates
       if (row.geom && row.geom.startsWith('POINT')) {
         const match = row.geom.match(/POINT\(([^)]+)\)/);
         if (match) {
-          coordinates = match[1].split(' ').map(Number);
+          const coords = match[1].split(' ').map(Number);
+          if (coords.length >= 2) {
+            coordinates = [coords[0], coords[1]]; // [longitude, latitude]
+          }
         }
       }
       
@@ -140,7 +143,7 @@ export async function GET(request: NextRequest) {
           occurred_at: row.occurred_at.toISOString(),
           location_text: row.location_text,
           article_count: parseInt(row.article_count),
-          credibility_avg: parseFloat(row.credibility_score)
+          credibility_avg: parseFloat(row.credibility_avg)
         }
       };
     });
