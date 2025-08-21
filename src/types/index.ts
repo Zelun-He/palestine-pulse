@@ -1,0 +1,115 @@
+export interface Source {
+  id: string;
+  name: string;
+  url: string;
+  type: 'primary_ngo' | 'international_media' | 'local_media' | 'government' | 'other';
+  credibility_score: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface Article {
+  id: string;
+  source_id: string;
+  url: string;
+  title: string;
+  published_at: Date;
+  fetched_at: Date;
+  lang: string;
+  raw_text: string;
+  hash: string;
+  status: 'pending' | 'processed' | 'error' | 'archived';
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface Event {
+  id: string;
+  canonical_title: string;
+  occurred_at: Date;
+  category: 'military' | 'humanitarian' | 'political' | 'economic' | 'social' | 'other';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  summary: string;
+  geom: string; // PostGIS Point/Polygon as WKT
+  location_text: string;
+  admin1?: string; // Governorate
+  admin2?: string; // District
+  admin3?: string; // Sub-district
+  privacy_obfuscation_m: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface EventArticle {
+  event_id: string;
+  article_id: string;
+  similarity: number;
+  is_primary: boolean;
+  created_at: Date;
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  created_at: Date;
+}
+
+export interface EventTag {
+  event_id: string;
+  tag_id: string;
+  created_at: Date;
+}
+
+export interface MapBounds {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+}
+
+export interface EventFilters {
+  bbox?: MapBounds;
+  start_date?: Date;
+  end_date?: Date;
+  category?: Event['category'];
+  min_credibility?: number;
+  zoom?: number;
+  search?: string;
+}
+
+export interface GeoJSONFeature {
+  type: 'Feature';
+  geometry: {
+    type: 'Point' | 'Polygon';
+    coordinates: number[] | number[][];
+  };
+  properties: {
+    id: string;
+    title: string;
+    category: Event['category'];
+    severity: Event['severity'];
+    occurred_at: string;
+    location_text: string;
+    article_count: number;
+    [key: string]: any;
+  };
+}
+
+export interface GeoJSONCollection {
+  type: 'FeatureCollection';
+  features: GeoJSONFeature[];
+}
+
+export interface MapViewState {
+  center: [number, number];
+  zoom: number;
+  bounds?: MapBounds;
+}
+
+export interface TimelineState {
+  start_date: Date;
+  end_date: Date;
+  current_time: Date;
+  is_playing: boolean;
+  playback_speed: number;
+}
